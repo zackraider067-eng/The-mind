@@ -15,7 +15,7 @@
 @media(max-width:720px){.grid{grid-template-columns:1fr}.card{min-height:0}.skills{grid-template-columns:repeat(3,1fr)}.hero{padding:20px}.stats{gap:7px}.stat{padding:10px}.stat b{font-size:20px}.top{align-items:flex-start}.tag{font-size:10px;padding:7px 9px}}
 </style></head>
 <body><main class="app">
-<header class="top"><div class="brand"><div class="logo">M</div><div><h1>MIND FORGE</h1><small>COGNITIVE TRAINING STUDIO</small></div></div><div class="topright"><span class="tag" id="levelTag">المستوى 1</span><span class="tag">الإصدار 0.2</span></div></header>
+<header class="top"><div class="brand"><div class="logo">M</div><div><h1>MIND FORGE</h1><small>COGNITIVE TRAINING STUDIO</small></div></div><div class="topright"><span class="tag" id="levelTag">المستوى 1</span><span class="tag" id="connectionTag">جارٍ فحص الاتصال…</span><span class="tag">الإصدار 0.3</span></div></header>
 <section class="hero"><div class="eyebrow">BUILD BETTER THINKING · ONE SESSION AT A TIME</div><h2>قوّي مهاراتك العقلية<br>بالتدريب والقياس.</h2><p>مساحة تدريب عربية للذاكرة والانتباه والتفكير المنطقي. ابدأ بمستواك الحالي، تدرب بانتظام، وراقب أداءك الحقيقي داخل كل تمرين.</p><div class="stats"><div class="stat"><b id="totalSessions">0</b><span>جلسات مكتملة</span></div><div class="stat"><b id="totalMinutes">0</b><span>دقائق تدريب</span></div><div class="stat"><b id="activeDays">0</b><span>أيام نشطة</span></div></div></section>
 <div class="sectionhead"><h3>مركز التدريب</h3><span>اختر مهارة وابدأ</span></div>
 <section class="grid">
@@ -28,7 +28,7 @@
 <section class="panel"><div class="panelhead"><h3>سجل التدريب</h3><button class="btn secondary" onclick="clearHistory()">مسح السجل</button></div><div id="history" class="history"><p class="muted">لا توجد جلسات بعد. أكمل أول تمرين ليظهر سجلّك هنا.</p></div></section>
 <section class="panel activity" id="activity"><div class="activityhead"><span id="gameType">التدريب</span><span id="roundLabel">1 / 5</span></div><div class="progress"><i id="gameProgress"></i></div><h3 id="gameTitle">جاهز؟</h3><p class="instruction" id="gameInstruction"></p><div class="prompt" id="prompt"></div><div id="controls"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="btn secondary" onclick="endEarly()">إنهاء الجلسة</button></section>
 <section class="panel"><h3>مهم تعرف</h3><p class="muted">هذه نسخة تدريبية أولية. النتائج تصف أداءك في التمارين نفسها، وليست اختبار ذكاء معياريًا أو تشخيصًا طبيًا، ولا تثبت وحدها تحسن الذكاء العام أو انتقال التحسن إلى البرمجة واللغات. سنضيف اختبارات معيارية ومهامًا تطبيقية لاحقًا بدل تقديم وعود غير مثبتة.</p></section>
-<div class="footer">MIND FORGE · الإصدار 0.2 · تُحفظ بيانات التدريب محليًا على هذا الجهاز</div>
+<div class="footer">MIND FORGE · الإصدار 0.3 · يعمل محليًا بعد أول تحميل ناجح</div>
 </main>
 <script>
 const $=id=>document.getElementById(id);
@@ -55,5 +55,7 @@ const patterns=[[[2,4,6,8],10],[[3,6,9,12],15],[[1,2,4,8],16],[[5,10,15,20],25],
 function logicRound(){nextRound();if(!game)return;const [seq,ans]=patterns[(game.round-1)%patterns.length];$('prompt').textContent=seq.join(' · ')+' · ؟';let opts=[ans,ans+2,Math.max(0,ans-2),ans+5];opts=[...new Set(opts)];while(opts.length<4)opts.push(ans+opts.length+3);opts.sort(()=>Math.random()-.5);$('controls').innerHTML='<div class="choices">'+opts.map(n=>'<button class="choice">'+n+'</button>').join('')+'</div>';$('controls').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(!game||game.locked)return;game.locked=true;const ok=Number(b.textContent)===ans;if(ok)game.correct++;$('feedback').textContent=ok?'استنتاج صحيح':'الإجابة الصحيحة: '+ans;timeout=setTimeout(logicRound,600)})}
 function clearHistory(){if(!confirm('هل تريد مسح سجل التدريب والنتائج المحفوظة على هذا الجهاز؟'))return;data=JSON.parse(JSON.stringify(blank));persist()}
 render();
+function updateConnection(){const el=$('connectionTag');if(!el)return;el.textContent=navigator.onLine?'متصل · البيانات محلية':'أوفلاين · جاهز';el.style.color=navigator.onLine?'var(--mint)':'var(--gold)'}
+window.addEventListener('online',updateConnection);window.addEventListener('offline',updateConnection);updateConnection();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script></body></html>
